@@ -1,0 +1,20 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+*.session
+*.session-journal
+downloads/
+playback/
+logs/
+*.log
+.DS_Store
+
+# Private environment files
+sample.env
+.env
+.env.*
+!.env.example
+*.session
+*.session-journal

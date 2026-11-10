@@ -1,0 +1,99 @@
+{
+  "name": "waifu-slayer",
+  "description": "WAIFU-SLAYER by BOTNEX — Telegram Voice Chat Music Bot with queue management, AutoPlay and playback controls.",
+  "logo": "https://files.catbox.moe/4hl7n8.jpg",
+  "keywords": [
+    "python3",
+    "telegram",
+    "bot",
+    "BOTNEX",
+    "WAIFU-SLAYER",
+    "MusicBot",
+    "telegram-bot",
+    "pyrogram"
+  ],
+  "env": {
+    "API_ID": {
+      "description": "Get this value from https://my.telegram.org",
+      "value": "",
+      "required": true
+    },
+    "API_HASH": {
+      "description": "Get this value from https://my.telegram.org",
+      "value": "",
+      "required": true
+    },
+    "BOT_TOKEN": {
+      "description": "A Bot's token from Botfather",
+      "value": "",
+      "required": true
+    },
+    "MONGO_DB_URI": {
+      "description": "Get a mongodb url from https://cloud.mongodb.com.",
+      "value": "",
+      "required": true
+    },
+    "OWNER_ID": {
+      "description": "The user id of user whom you would like to add as OWNER.",
+      "value": "",
+      "required": true
+    },
+    "STRING_SESSION": {
+      "description": "A Pyrogram v2 string session for the assistant account used by WAIFU-SLAYER.",
+      "value": "",
+      "required": true
+    },
+    "HEROKU_API_KEY": {
+      "description": "Your Heroku account's API key",
+      "value": "",
+      "required": false
+    },
+    "HEROKU_APP_NAME": {
+      "description": "Your heroku app name",
+      "value": "",
+      "required": false
+    },
+    "GIT_TOKEN": {
+      "description": "Your Private Github Token",
+      "value": "",
+      "required": false
+    },
+    "LOGGER_ID": {
+      "description": "Your private Telegram logger group ID. Add the bot and assistant account and grant permission to send messages.",
+      "value": "",
+      "required": true
+    },
+    "ERROR_LOGGER_ID": {
+      "description": "Telegram group ID where uncaught bot errors and tracebacks are reported.",
+      "value": "",
+      "required": false
+    },
+    "CLONE_START_CONCURRENCY": {
+      "description": "How many saved clone bots can start in parallel after deploy/restart.",
+      "value": "6",
+      "required": false
+    },
+    "CLONE_START_TIMEOUT": {
+      "description": "Maximum seconds allowed for one clone to start.",
+      "value": "45",
+      "required": false
+    },
+    "ASSISTANT_START_TIMEOUT": {
+      "description": "Maximum seconds allowed for one clone assistant to start.",
+      "value": "30",
+      "required": false
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    },
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git"
+    }
+  ],
+  "stack": "container"
+}
