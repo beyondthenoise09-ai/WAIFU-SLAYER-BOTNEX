@@ -48,6 +48,23 @@ from SHIVMUSIC.utils.equalizer import (
 from SHIVMUSIC.error_logger import report_exception
 
 
+def _resolve_audio_quality():
+    """Audio quality is read from the AUDIO_QUALITY env var (Railway variable).
+
+    Free Railway plan (1 vCPU): leave it unset or use MEDIUM for smooth, lag-free
+    playback. After upgrading to a paid plan set AUDIO_QUALITY=HIGH (or STUDIO).
+    Invalid values safely fall back to MEDIUM. Video quality is not affected.
+    """
+    name = str(os.getenv("AUDIO_QUALITY", "MEDIUM")).strip().upper()
+    quality = getattr(AudioQuality, name, None)
+    if quality is None:
+        quality = getattr(AudioQuality, "MEDIUM", None) or getattr(AudioQuality, "HIGH")
+    return quality
+
+
+AUDIO_QUALITY = _resolve_audio_quality()
+
+
 def _install_pytgcalls_client_compatibility():
     """Make PyTgCalls recognise our wrapped Pyrogram client.
 
@@ -220,14 +237,14 @@ class Call:
     async def _safe_change_stream(self, client, chat_id, file_path, video=False, extra_args=""):
         extra_args = self._with_eq(chat_id, extra_args)
         if not video:
-            stream = MediaStream(file_path, audio_parameters=AudioQuality.HIGH, ffmpeg_parameters=extra_args)
+            stream = MediaStream(file_path, audio_parameters=AUDIO_QUALITY, ffmpeg_parameters=extra_args)
             await client.play(chat_id, stream)
             return
 
         try: 
             stream = MediaStream(
                 file_path, 
-                audio_parameters=AudioQuality.HIGH, 
+                audio_parameters=AUDIO_QUALITY, 
                 video_parameters=VideoQuality.HD_720p, 
                 ffmpeg_parameters=extra_args
             )
@@ -236,7 +253,7 @@ class Call:
             LOGGER(__name__).warning(f"720p Change Stream failed, auto-switching to 480p: {e}")
             stream = MediaStream(
                 file_path, 
-                audio_parameters=AudioQuality.HIGH, 
+                audio_parameters=AUDIO_QUALITY, 
                 video_parameters=VideoQuality.SD_480p, 
                 ffmpeg_parameters=extra_args
             )
@@ -245,13 +262,13 @@ class Call:
     async def _safe_join_call(self, assistant_to_join, chat_id, file_path, video=False):
         extra_args = self._with_eq(chat_id)
         if not video:
-            stream = MediaStream(file_path, audio_parameters=AudioQuality.HIGH, ffmpeg_parameters=extra_args)
+            stream = MediaStream(file_path, audio_parameters=AUDIO_QUALITY, ffmpeg_parameters=extra_args)
             return await assistant_to_join.play(chat_id, stream)
 
         try: 
             stream = MediaStream(
                 file_path, 
-                audio_parameters=AudioQuality.HIGH, 
+                audio_parameters=AUDIO_QUALITY, 
                 video_parameters=VideoQuality.HD_720p,
                 ffmpeg_parameters=extra_args
             )
@@ -260,7 +277,7 @@ class Call:
             LOGGER(__name__).warning(f"720p Join Call failed, auto-switching to 480p: {e}")
             stream = MediaStream(
                 file_path, 
-                audio_parameters=AudioQuality.HIGH, 
+                audio_parameters=AUDIO_QUALITY, 
                 video_parameters=VideoQuality.SD_480p,
                 ffmpeg_parameters=extra_args
             )
