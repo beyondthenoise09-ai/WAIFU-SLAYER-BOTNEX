@@ -1,17 +1,60 @@
-# --- ffmpeg/ffprobe fallback for hosts without root ---
+# --- ffmpeg/ffprobe fallback for hosts without root (no apt-get / no Dockerfile) ---
+import os as _os
 import shutil as _shutil
+import sys as _sys
 
-if not (_shutil.which("ffmpeg") and _shutil.which("ffprobe")):
-    try:
-        import static_ffmpeg as _static_ffmpeg
 
+def _ensure_ffmpeg():
+    if _shutil.which("ffmpeg") and _shutil.which("ffprobe"):
+        return
+    import platform
+    import tarfile
+    import tempfile
+    import urllib.request
+
+    if not _sys.platform.startswith("linux") or platform.machine().lower() not in ("x86_64", "amd64"):
+        return
+
+    url = _os.getenv(
+        "FFMPEG_DOWNLOAD_URL",
+        "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz",
+    )
+    bin_dir = None
+    for base in (_os.path.expanduser("~"), tempfile.gettempdir()):
         try:
-            _static_ffmpeg.add_paths(weak=True)
-        except TypeError:
-            _static_ffmpeg.add_paths()
-    except Exception as _ffmpeg_err:
-        print(f"[WARN] static-ffmpeg setup skipped: {_ffmpeg_err}")
-# ------------------------------------------------------
+            candidate = _os.path.join(base, ".botnex_ffmpeg")
+            _os.makedirs(candidate, exist_ok=True)
+            if _os.access(candidate, _os.W_OK):
+                bin_dir = candidate
+                break
+        except Exception:
+            continue
+    if not bin_dir:
+        return
+
+    ffmpeg_path = _os.path.join(bin_dir, "ffmpeg")
+    ffprobe_path = _os.path.join(bin_dir, "ffprobe")
+    if not (_os.path.exists(ffmpeg_path) and _os.path.exists(ffprobe_path)):
+        print("[INFO] ffmpeg not found on host, downloading static build (one time)...")
+        with urllib.request.urlopen(url, timeout=120) as resp:
+            with tarfile.open(fileobj=resp, mode="r|xz") as tar:
+                for member in tar:
+                    name = _os.path.basename(member.name)
+                    if member.isfile() and name in ("ffmpeg", "ffprobe"):
+                        src = tar.extractfile(member)
+                        with open(_os.path.join(bin_dir, name), "wb") as out:
+                            _shutil.copyfileobj(src, out)
+                        _os.chmod(_os.path.join(bin_dir, name), 0o755)
+        print("[INFO] ffmpeg/ffprobe ready.")
+    _os.environ["PATH"] = bin_dir + _os.pathsep + _os.environ.get("PATH", "")
+
+
+try:
+    _ensure_ffmpeg()
+except Exception as _ffmpeg_err:
+    print(f"[WARN] ffmpeg setup skipped: {_ffmpeg_err}")
+# -----------------------------------------------------------------------------
+
 from SHIVMUSIC.core.bot import ANJALI
 from SHIVMUSIC.core.dir import dirr
 from SHIVMUSIC.core.git import git
