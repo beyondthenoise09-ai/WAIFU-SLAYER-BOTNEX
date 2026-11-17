@@ -11,7 +11,13 @@ from pyrogram.enums import ParseMode
 
 from pytgcalls import PyTgCalls
 from pytgcalls.mtproto.bridged_client import BridgedClient
-from pytgcalls.types import MediaStream, AudioQuality, VideoQuality
+from pytgcalls.types import MediaStream, VideoQuality
+from pytgcalls.types import AudioQuality as _RealAudioQuality
+
+
+class AudioQuality:
+    """Music quality for low-CPU hosting. MEDIUM = balanced."""
+    HIGH = getattr(_RealAudioQuality, "MEDIUM", None) or getattr(_RealAudioQuality, "HIGH")
 
 import config
 from SHIVMUSIC import LOGGER, YouTube, app, userbot
