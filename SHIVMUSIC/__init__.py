@@ -1,3 +1,17 @@
+# --- ffmpeg/ffprobe fallback for hosts without root ---
+import shutil as _shutil
+
+if not (_shutil.which("ffmpeg") and _shutil.which("ffprobe")):
+    try:
+        import static_ffmpeg as _static_ffmpeg
+
+        try:
+            _static_ffmpeg.add_paths(weak=True)
+        except TypeError:
+            _static_ffmpeg.add_paths()
+    except Exception as _ffmpeg_err:
+        print(f"[WARN] static-ffmpeg setup skipped: {_ffmpeg_err}")
+# ------------------------------------------------------
 from SHIVMUSIC.core.bot import ANJALI
 from SHIVMUSIC.core.dir import dirr
 from SHIVMUSIC.core.git import git
