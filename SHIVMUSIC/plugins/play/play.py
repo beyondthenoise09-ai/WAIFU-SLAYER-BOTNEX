@@ -57,8 +57,7 @@ def is_vc_off(e):
             "noactivegroupcall",
             "groupcallnotfound",
             "chat_admin_required",
-            "creategroupcall",
-            "voice chat is turned on"
+                        "creategroupcall",
         ]
         if any(err in ex_str for err in vc_errors) or any(err in ex_name for err in vc_errors):
             return True
